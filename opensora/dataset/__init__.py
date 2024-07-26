@@ -8,7 +8,7 @@ from opensora.dataset.t2v_datasets import T2V_dataset
 from opensora.dataset.transform import ToTensorVideo, TemporalRandomCrop, RandomHorizontalFlipVideo, CenterCropResizeVideo, LongSideResizeVideo, SpatialStrideCropVideo
 from opensora.models.causalvideovae import ae_norm, ae_denorm
 
-def getdataset(args):
+def getdataset(args, rank=0, video_decoder='decord'):
     temporal_sample = TemporalRandomCrop(args.num_frames)  # 16 x
     norm_fun = ae_norm[args.ae]
     if args.dataset == 't2v':
@@ -28,8 +28,9 @@ def getdataset(args):
         ])
         # tokenizer = AutoTokenizer.from_pretrained("/storage/ongoing/new/Open-Sora-Plan/cache_dir/mt5-xxl", cache_dir=args.cache_dir)
         tokenizer = AutoTokenizer.from_pretrained(args.text_encoder_name, cache_dir=args.cache_dir)
-        return T2V_dataset(args, transform=transform, temporal_sample=temporal_sample, tokenizer=tokenizer, 
-                           transform_topcrop=transform_topcrop)
+        # return T2V_dataset(args, transform=transform, temporal_sample=temporal_sample, tokenizer=tokenizer, 
+        #                    transform_topcrop=transform_topcrop)
+        return S3_T2V_dataset(args, transform=transform, temporal_sample=temporal_sample, tokenizer=tokenizer, rank=rank, video_decoder=video_decoder)
     raise NotImplementedError(args.dataset)
 
 

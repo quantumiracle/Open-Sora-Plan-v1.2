@@ -548,7 +548,7 @@ class OpenSoraT2V(ModelMixin, ConfigMixin):
             output = output_img
 
         if return_middle_feature:
-            tracked_hidden_states = rearrange(tracked_hidden_states, '(b f) t d -> b f t d',
+            tracked_hidden_states = rearrange(tracked_hidden_states, '(b f) t d -> b f t d',  # TODO need fix
                                                   b=batch_size)
             return tracked_hidden_states
 
