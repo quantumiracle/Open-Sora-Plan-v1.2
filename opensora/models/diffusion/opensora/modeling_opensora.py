@@ -288,6 +288,7 @@ class OpenSoraT2V(ModelMixin, ConfigMixin):
         encoder_attention_mask: Optional[torch.Tensor] = None,
         use_image_num: Optional[int] = 0,
         return_dict: bool = True,
+        return_middle_feature: bool = False,
     ):
         """
         The [`Transformer2DModel`] forward method.
@@ -431,7 +432,7 @@ class OpenSoraT2V(ModelMixin, ConfigMixin):
                 # print('timestep_vid', timestep_vid.shape)
 
                 
-        for block in self.transformer_blocks:
+        for i, block in enumerate(self.transformer_blocks):
             if self.training and self.gradient_checkpointing:
 
                 def create_custom_forward(module, return_dict=None):
@@ -508,6 +509,12 @@ class OpenSoraT2V(ModelMixin, ConfigMixin):
             if hidden_states_vid is not None:
                 hidden_states_vid = rearrange(hidden_states_vid, 's b h -> b s h', b=batch_size).contiguous()
 
+        if i == len(self.transformer_blocks) // 2:  # feature
+            if hidden_states_vid is not None:
+                tracked_hidden_states = hidden_states_vid
+            if hidden_states_img is not None:
+                tracked_hidden_states = hidden_states_img
+
         # 3. Output
         output_vid, output_img = None, None 
         if hidden_states_vid is not None:
@@ -539,6 +546,11 @@ class OpenSoraT2V(ModelMixin, ConfigMixin):
             output = output_vid
         elif output_img is not None:
             output = output_img
+
+        if return_middle_feature:
+            tracked_hidden_states = rearrange(tracked_hidden_states, '(b f) t d -> b f t d',
+                                                  b=batch_size)
+            return tracked_hidden_states
 
         if not return_dict:
             return (output,)
