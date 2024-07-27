@@ -5,6 +5,7 @@ from torchvision import transforms
 from torchvision.transforms import Lambda
 
 from opensora.dataset.t2v_datasets import T2V_dataset
+from opensora.dataset.s3_t2v_datasets import S3_T2V_dataset
 from opensora.dataset.transform import ToTensorVideo, TemporalRandomCrop, RandomHorizontalFlipVideo, CenterCropResizeVideo, LongSideResizeVideo, SpatialStrideCropVideo
 from opensora.models.causalvideovae import ae_norm, ae_denorm
 
@@ -12,8 +13,8 @@ def getdataset(args, rank=0, video_decoder='decord'):
     temporal_sample = TemporalRandomCrop(args.num_frames)  # 16 x
     norm_fun = ae_norm[args.ae]
     if args.dataset == 't2v':
-        resize_topcrop = [CenterCropResizeVideo((args.max_height, args.max_width), top_crop=True), ]
-        resize = [CenterCropResizeVideo((args.max_height, args.max_width)), ]
+        resize_topcrop = [CenterCropResizeVideo((args.height, args.width), top_crop=True), ]
+        resize = [CenterCropResizeVideo((args.height, args.width)), ]
         transform = transforms.Compose([
             ToTensorVideo(),
             *resize, 
