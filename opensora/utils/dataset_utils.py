@@ -62,8 +62,8 @@ class Collate:
         self.group_frame = args.group_frame
         self.group_resolution = args.group_resolution
 
-        self.max_height = args.max_height
-        self.max_width = args.max_width
+        self.max_height = args.height
+        self.max_width = args.width
         self.ae_stride = args.ae_stride
 
         self.ae_stride_t = args.ae_stride_t
